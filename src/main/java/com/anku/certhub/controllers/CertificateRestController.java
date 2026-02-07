@@ -2,11 +2,11 @@ package com.anku.certhub.controllers;
 
 import com.anku.certhub.services.CetrificateService;
 import com.anku.certhub.services.model.CertificateMetadata;
-import jakarta.websocket.server.PathParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -33,7 +33,7 @@ public class CertificateRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CertificateMetadata> getCertificateById(@PathParam("id") UUID uuid) {
+    public ResponseEntity<CertificateMetadata> getCertificateById(@PathVariable("id") UUID uuid) {
         return ResponseEntity.ok(cetrificateService.getMetadataById(uuid));
     }
 

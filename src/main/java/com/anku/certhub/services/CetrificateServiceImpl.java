@@ -1,15 +1,19 @@
 package com.anku.certhub.services;
 
 import com.anku.certhub.services.model.CertificateMetadata;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
@@ -31,6 +35,16 @@ public class CetrificateServiceImpl implements CetrificateService {
 
     public CetrificateServiceImpl(CertificateCache cache) {
         this.cache = cache;
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            Files.createDirectories(uploads);
+        } catch (IOException e) {
+            logger.error("Cannot create uploads dir",e);
+            throw new RuntimeException("Cannot create uploads dir",e);
+        }
     }
 
     @Override
@@ -106,7 +120,32 @@ public class CetrificateServiceImpl implements CetrificateService {
     @Override
     public void clearUploadsDir() {
         try {
-            Files.deleteIfExists(uploads);
+            Files.walkFileTree(uploads, new FileVisitor<Path>() {
+
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    if (exc == null) {
+                        Files.delete(dir);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
         } catch (IOException e) {
             logger.error("Cannot clear uploads directory", e);
             throw new RuntimeException("Cannot clear uploads directory", e);
