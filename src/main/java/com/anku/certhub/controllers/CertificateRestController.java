@@ -44,7 +44,7 @@ public class CertificateRestController {
             cetrificateService.validate(x509Certificate);
             CertificateMetadata metadata = cetrificateService.getMetadata(x509Certificate);
             cetrificateService.save(metadata, certificateFile);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Certificate is successfully uploaded");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Certificate is successfully uploaded\n");
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

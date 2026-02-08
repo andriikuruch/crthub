@@ -1,0 +1,6 @@
+services:
+  app:
+    image: certhub:latest
+    build: .
+    ports:
+      - "8080:8080"
